@@ -1,20 +1,3 @@
-"""Compatibilidade das ops customizadas do StyleGAN neste ambiente Windows.
-
-Esta copia do dnnlib/torch_utils (linhagem StyleGAN3) levanta RuntimeError quando
-nao encontra MSVC/CUDA Toolkit para compilar bias_act/upfirdn2d/filtered_lrelu, em
-vez de cair na implementacao de referencia como o StyleGAN2-ADA fazia.
-
-`use_ref_ops()` restaura esse comportamento: se o plugin nao compilar, as ops usam
-a versao em PyTorch puro (mais lenta, mesmos resultados numericos ate tolerancia).
-
-Uso, antes de carregar o pickle do gerador:
-
-    import cbae_compat; cbae_compat.use_ref_ops()
-
-Depois de instalar o VS Build Tools + CUDA Toolkit, basta nao chamar a funcao (ou
-chamar use_ref_ops(force=False), que so desativa o plugin se ele realmente falhar).
-"""
-
 import warnings
 
 _PLUGIN_MODULES = ("bias_act", "upfirdn2d", "filtered_lrelu")
