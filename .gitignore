@@ -1,0 +1,84 @@
+# --- Guia local (nao versionado) ---
+guia_implementacao_CB-AE.pdf
+dataset/
+runs/
+out_gan/
+train/
+# --- Pesos e checkpoints ---
+*.pkl
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+checkpoints/
+runs/
+outputs/
+logs/
+
+# --- Dados ---
+data/
+datasets/
+celeba_hq/
+*.zip
+*.tar
+*.tar.gz
+*.lmdb
+*.npz
+*.npy
+
+# --- Amostras, grades e FID ---
+samples/
+images_for_fid/
+fid_stats/
+*.mp4
+
+# --- Experiment tracking ---
+wandb/
+mlruns/
+events.out.tfevents.*
+lightning_logs/
+
+# --- Cache das ops CUDA customizadas do StyleGAN ---
+.cache/
+torch_extensions/
+*.ptx
+*.cubin
+
+# --- Codigo de terceiros (NVIDIA, baixar de NVlabs/stylegan3) ---
+torch_utils/
+
+# --- Claude Code ---
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+.mcp.json
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+build/
+dist/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# --- Ambientes ---
+.venv/
+venv/
+env/
+.env
+.python-version
+
+# --- Editores e SO ---
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+ehthumbs.db
+Desktop.ini
