@@ -2,7 +2,11 @@ import random
 import torch
 import torch.nn.functional as F
 
-from .config import N_CLASSES, HAIR, OTHER_HAIR, IGNORE
+from .config import CONCEPTS, N_CLASSES, HAIR, OTHER_HAIR, IGNORE
+
+def concept_name(k):
+    """Nome curto do conceito k, para logs e colunas de CSV."""
+    return "Hair" if k == HAIR else CONCEPTS[k][1].replace(" ", "_")
 
 def concept_slice(k):
     s = sum(N_CLASSES[:k])
