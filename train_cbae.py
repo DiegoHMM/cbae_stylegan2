@@ -7,8 +7,6 @@ import pickle
 import os
 import random
 
-
-
 CONCEPTS = [
     ("NOT Attractive", "Attractive"),
     ("NO Lipstick", "Wearing Lipstick"),
@@ -20,6 +18,7 @@ CONCEPTS = [
     ("Straight Eyebrows", "Arched Eyebrows"),
     ("NO Mustache", "Mustache"),
     ("NO Earrings", "Wearing Earrings"),
+    ("Old", "Young"),
     ("Bald", "Black Hair", "Blond Hair", "Brown Hair", "Gray Hair", "Other Hair"),
 ]
 CLASSIFIER_FILES = [
@@ -33,6 +32,7 @@ CLASSIFIER_FILES = [
     "celebahq_Arched_Eyebrows_rn18_conclsf.pth",
     "celebahq_Mustache_rn18_conclsf.pth",
     "celebahq_Wearing_Earrings_rn18_conclsf.pth",
+    "celebahq_Young_rn18_conclsf.pth",
     "celebahq_HairType6_rn18_conclsf.pth",
 ]
 N_CLASSES = [len(c) for c in CONCEPTS]      # [2]*10 + [6]
@@ -210,7 +210,7 @@ def train_step(G, cbae, M, opt, opt_int, batch):
         opt.step()
 
 
-    # Fase B - swap no conceito (intervenção) e verificação do alinhamento (L_c) 
+    # Fase B - intervenção: troca o conceito k pela classe v (L_i1, L_i2)
     k = torch.randint(len(N_CLASSES), (1,)).item()
     v = sample_target(k)
     with torch.no_grad():
@@ -225,11 +225,18 @@ def train_step(G, cbae, M, opt, opt_int, batch):
     x_int = G.synthesis(w_int, noise_mode="const")
 
     x_logits = M.logits(x_int)
+
     L_i1 = sum(masked_cross_entropy(x_l, y_l) for x_l,y_l in zip(x_logits, y_int))
-    
+    L_i2 = concept_cross_entropy(cbae.enc(w_int), y_int)
+
+    loss_b = L_i1 + L_i2
+    if torch.isfinite(loss_b):
+        loss_b.backward()
+        opt_int.step()
 
 
-    return 0
+    return dict(L_r1=L_r1.detach().item(), L_r2=L_r2.detach().item(), L_c=float(L_c.detach()),
+                L_i1=float(L_i1.detach()), L_i2=float(L_i2.detach()))
 
 
 
@@ -248,3 +255,17 @@ opt = torch.optim.Adam(cbae.parameters(), lr=LR, betas=BETAS)
 opt_int = torch.optim.Adam(cbae.parameters(), lr=LR, betas=BETAS)
 
 train_step(G, cbae, M, opt, opt_int, batch=16)
+
+
+EPOCHS, ITERS, BATCH = 50, 1000, 16
+
+for epoch in range(1, EPOCHS + 1):
+    cbae.train()
+    for it in range(1, ITERS + 1):
+        logs = train_step(G, cbae, M, opt, opt_int, BATCH)
+        if it % 50 == 0:
+            print(epoch, it, {k: round(v, 4) for k, v in logs.items()})
+
+    torch.save({"epoch": epoch, "cbae": cbae.state_dict(),
+                "opt": opt.state_dict(), "opt_int": opt_int.state_dict()},
+               "last.pt")
