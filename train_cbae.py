@@ -117,6 +117,10 @@ if __name__ == "__main__":
     # os mesmos z em todas as avaliações, para comparar épocas de forma justa
     z_eval = torch.randn(N_EVAL, G.z_dim, generator=torch.Generator().manual_seed(0)).to(device)
 
+    # melhor modelo: maior steer_mean na avaliação (mesmos z_eval em todas as épocas)
+    BEST_METRIC = "steer_mean"
+    best_score, best_epoch = float("-inf"), None
+
     t_start = time.time()
     total_iters = EPOCHS * ITERS
     for epoch in range(1, EPOCHS + 1):
@@ -154,6 +158,11 @@ if __name__ == "__main__":
         torch.save(state, os.path.join(run_dir, "checkpoints", "last.pt"))
         if epoch % 10 == 0:
             torch.save(cbae.state_dict(), os.path.join(run_dir, "checkpoints", f"cbae_epoch{epoch:02d}.pt"))
+        if ev[BEST_METRIC] > best_score:
+            best_score, best_epoch = ev[BEST_METRIC], epoch
+            torch.save(cbae.state_dict(), os.path.join(run_dir, "checkpoints", "best.pt"))
+            print(f"novo melhor modelo: época {epoch} {BEST_METRIC}={best_score:.1%}")
 
+    print(f"melhor modelo: época {best_epoch} {BEST_METRIC}={best_score:.1%}")
     train_file.close()
     eval_file.close()

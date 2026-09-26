@@ -1,9 +1,9 @@
 # --- Guia local (nao versionado) ---
 guia_implementacao_CB-AE.pdf
 dataset/
-runs/
 out_gan/
 train/
+
 # --- Pesos e checkpoints ---
 *.pkl
 *.pt
@@ -11,7 +11,6 @@ train/
 *.ckpt
 *.safetensors
 checkpoints/
-runs/
 outputs/
 logs/
 

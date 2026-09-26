@@ -29,7 +29,7 @@ CLASSIFIER_FILES = [
 N_CLASSES = [len(c) for c in CONCEPTS]      # [2]*11 + [6]
 HAIR = len(CONCEPTS) - 1                         # índice do conceito de cabelo (11)
 OTHER_HAIR = CONCEPTS[HAIR].index("Other Hair")  # classe sem significado visual (5)
-N_UNK = 40                            
+N_UNK = 10                            
 CONCEPT_DIM = sum(N_CLASSES) + N_UNK        # 22 + 6 + 40 = 68
 device = "cuda"
 
